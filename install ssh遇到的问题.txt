@@ -1,0 +1,55 @@
+windows上的ssh secure shell client连接ubuntu
+
+windows可以ping不通ubuntu，但虚拟机ubuntu能ping通windows
+解决方法：换成bridge模式即可
+
+结果终端提示:
+无法获得锁 /var/lib/dpkg/lock - open (11: 资源暂时不可用) 
+E: 无法锁定管理目录(/var/lib/dpkg/)，是否有其他进程正占用它？”
+解决办法如下：
+1.终端输入 ps  -aux ，列出进程,找到含有apt-get的进程，直接sudo kill PID解决。
+2.强制解锁--命令:
+sudo rm /var/cache/apt/archives/lock
+sudo rm /var/lib/dpkg/lock
+
+安装ssh提示无法下载和无法解析域名。。。
+
+更换源(更换前需备份)，sudo gedit /etc/apt/sources.list
+# deb cdrom:[Ubuntu 16.04 LTS _Xenial Xerus_ - Release amd64 (20160420.1)]/ xenial main restricted
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial universe
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates universe
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security universe
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security multiverse
+
+安装SSH
+sudo apt-get install openssh-server
+安装好后查看SSH是否启动 
+打开”终端窗口”，输入”sudo ps -e |grep ssh“–>回车–>有sshd,说明ssh服务已经启动，如果没有启动，输入”sudo service ssh start“–>回车–>ssh服务就会启动
+使用gedit修改配置文件”/etc/ssh/sshd_config” 获取远程ROOT权限 
+打开”终端窗口”，输入”sudo gedit /etc/ssh/sshd_config“–>回车–>把配置文件中的”PermitRootLogin without-password“加一个”#”号,把它注释掉–>再增加一句”PermitRootLogin yes“–>保存，修改成功
+查看Ubuntu 16.04的IP地址 
+打开”终端窗口”，输入”sudo ifconfig“–>回车–>就可以查看到IP地址。
+但后续使用ssh secure shell client 登录时显示algorithm negotiation failed
+ssh secure shell clinet访问成功
+后续使用ssh secure shell client 登录时显示algorithm negotiation failed
+修改server端ssh的配置文件 /etc/ssh/sshd_config
+
+在配置文件中添加：
+
+Ciphers aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,3des-cbc,arcfour128,arcfour256,arcfour,blowfish-cbc,cast128-cbc
+
+MACs hmac-md5,hmac-sha1,umac-64@openssh.com,hmac-ripemd160,hmac-sha1-96,hmac-md5-96
+
+KexAlgorithms diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group1-sha1,curve25519-sha256@libssh.org
+
+重启sshd服务后，即可正常连接。
+
+ sudo service ssh restart
+ 
+完美登录ssh secure shell client

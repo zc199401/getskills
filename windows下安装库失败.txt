@@ -2,3 +2,38 @@
 报错:failed with error code 1 in ...
 解决方案:
 升级pip:python -m pip install --upgrade pip 
+
+2.win8.1安装pycrytpo时报错:无c++ 10.0
+在网站http://www.voidspace.org.uk/python/modules.shtml#pycrypto下载对应版本
+3.其他针对未安装vs的方法
+1.若已安装Visual Studio则添加环境变量VS90COMNTOOLS即可，不同的VS版本对应不同的环境变量值
+
+Visual Studio 2010 (VS10)设置 VS90COMNTOOLS=%VS100COMNTOOLS%
+Visual Studio 2012 (VS11)设置 VS90COMNTOOLS=%VS110COMNTOOLS%
+Visual Studio 2013 (VS12)设置 VS90COMNTOOLS=%VS120COMNTOOLS%
+
+2.若未安装Visual Studio，那么可以下载exe格式的pandas直接安装
+
+3.若找不到exe格式的安装文件，那么可以使用pip的安装方式 pip install pandas，如果还是出现问题那么可以下载whl格式的安装包，再使用pip方式进行安装
+
+whl格式的下载链接：http://www.lfd.uci.edu/~gohlke/pythonlibs/
+
+若对pip安装方式不太熟悉，可以参考该教程：http://www.360doc.com/content/14/1017/08/10724725_417590569.shtml
+
+针对whl文件的安装有个细节需要注意，就是得输入whl文件所在的完整路径
+
+例如我需要安装numpy，而numpy的whl安装文件
+
+所在路径为D:\python\numpy-1.9.2+mkl-cp33-none-win_amd64.whl
+
+那么采用pip安装方式应该如下操作
+
+C:Users\a>pip install D:\python\numpy-1.9.2+mkl-cp33-none-win_amd64.whl
+
+4.当安装完pandas之后，使用import pandas时可能会出现模块缺失的错误，那还得安装其他关联的模块，主要有pyparsing、matplotlib、openpyxl、setuptools、numpy、six、dateutil，同样采取pip直接安装的方式，或者下相应的whl格式文件之后再采用pip的安装方式
+
+模块的下载地址：http://www.lfd.uci.edu/~gohlke/pythonlibs/
+
+5.在python中使用cx_Oracle模块出现“DLL Load failed”的处理方法
+网上的一般方法是建议把   oci.dll   放入到Python的site-package文件夹下，但是具体oci.dll是哪个版本的，没有具体说明，
+这里我要说的是：oci.dll的版本一定要和cx_Oracle模块的版本一致，不一定要和实际的Oracle的数据版本一致。
