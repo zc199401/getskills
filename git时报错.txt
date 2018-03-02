@@ -1,3 +1,10 @@
+git步骤:
+1.git init 建立源
+2.git add . 添加所有文件到缓冲区
+3.git commit -m 'git' 提交
+4.git pull origin master
+5.git push -u origin master(push前一定要pull下，否则会报错)
+
 Pull is not possible because you have unmerged files.
 症状：pull的时候
 
