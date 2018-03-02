@@ -1,0 +1,18 @@
+Pull is not possible because you have unmerged files.
+症状：pull的时候
+
+$ git pull 
+Pull is not possible because you have unmerged files. 
+Please, fix them up in the work tree, and then use ‘git add/rm ’ 
+as appropriate to mark resolution, or use ‘git commit -a’
+
+应该是因为local文件冲突了
+
+提交本地文件 
+git add 
+git commit
+2.回退节点（如果没有什么重要代码修改的话） 
+git reset –hard XXXXX （git log 来查看 id）如果不写的话 就是上一次 git pull 之后的commit节点
+
+git reset –hard 这个样子就好了 
+回退到上一次
