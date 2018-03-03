@@ -1,0 +1,15 @@
+虚拟机:zc199401
+数据库:scott/ZC199401@orcl
+sys/ZC199401@orcl
+以管理员登录后修改密码有效期
+SELECT username,PROFILE FROM dba_users;
+SELECT * FROM dba_profiles s WHERE s.profile='DEFAULT' AND resource_name='PASSWORD_LIFE_TIME';
+alter profile default limit password_life_time unlimited;
+如忘记管理员密码:
+1、运行到C盘根目录
+2、输入：SET ORACLE_SID = 你的SID名称
+3、输入：sqlplus/nolog
+4、输入：connect/as sysdba
+5、输入：altre user sys identified by sys
+6、输入：altre user system identified by system
+连接pl/sql前需先打开服务-oracle监视器
