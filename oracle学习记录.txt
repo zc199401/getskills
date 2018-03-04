@@ -22,3 +22,5 @@ Actual Data	Specified As	Stored As
 0.00000123	NUMBER(2,7)	0.0000012
 1.20E-04	NUMBER(2,5)	0.00012
 1.20E-05	NUMBER(2,5)	0.00001
+
+2.可以用create or replace的对象有：functions, procedures, packages, types, synonyms, trigger and views，就是没有table，也没有sequence。 
