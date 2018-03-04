@@ -24,3 +24,74 @@ Actual Data	Specified As	Stored As
 1.20E-05	NUMBER(2,5)	0.00001
 
 2.可以用create or replace的对象有：functions, procedures, packages, types, synonyms, trigger and views，就是没有table，也没有sequence。 
+
+3.数据库连接方式
+INNER JOIN连接作为一种等值连接，其操作相当于where中的等至连接。
+LEFT JOIN连接以左边表为基表，其内容将全部显示。
+RIGHT JOIN连接以右边表为基表，其内容将全部显示。
+FULL  JOIN连接结果将两张表的内容都显示出来，相当于并集。
+NATURAL JION连接将两张表不包含的内容显示出来。相当于并集减交集。
+可以用(+)来表示,(+)在左边，相当于右连接，(+)在右边，相当于左连接
+
+4.extract()函数
+用于从一个date或者interval类型中截取特定部分
+语法:
+EXTRACT({YEAR|MONTH|DAY|HOUR|MINUTE|SECOND}
+	| {TIMEZOME_HOUR | TIMEZOME_MINUTE
+	| {TIMEZONE_RWGION | TIMEZOME_ABBR}}
+FROM {date_value | interval_value})
+timestamp的差则是很直观地显示为多少天＋多少小时＋多少分钟＋多少秒＋多少小数秒(不能是年)
+获取两个日期之间的具体时间间隔:
+select extract(day from td2 - td1) day,
+       extract(hour from td2 - td1) hour,
+       extract(minute from td2 - td1) minute,
+       extract(second from td2 - td1) second
+  from (select to_timestamp('2017-01-01 11:11:11', 'yyyy-mm-dd hh24:mi:ss') td1,
+               to_timestamp('2018-01-01 21:11:11', 'yyyy-mm-dd hh24:mi:ss') td2
+          from DUAL);
+5.PL/SQL Developer设置时间格式
+在Tools --> perferences --> user interfaces --> nls options 里可以设置date & time的格式
+date选的user defined,格式是 yyyy-mm-dd
+time选的user defined,格式是hh:mm:ss
+6.insert all
+1.)无条件
+INSERT ALL  
+    INTO t2   
+    VALUES (product_id, product_name,MONTH)  
+    INTO t2   
+    VALUES (product_id, product_name,MONTH+1)  
+    INTO t2   
+    VALUES (product_id, product_name,MONTH+2)  
+    INTO t2   
+    VALUES (product_id, product_name,MONTH+3)   
+SELECT product_id, product_name, MONTH  
+FROM t1;  
+2.)有条件
+INSERT ALL  
+    WHEN order_total < 100000 THEN  
+        INTO small_orders  
+    WHEN order_total > 100000 AND order_total < 200000 THEN  
+        INTO medium_orders  
+    ELSE  
+        INTO large_orders  
+    SELECT order_id, customer_id, order_total, sales_rep_id   
+      FROM orders;  
+3.)有条件insert first
+   如果第一个 WHEN 子句的值为 true，Oracle 服务器对于给定的行执行相应的 INTO 子句，
+并且跳过后面的 WHEN 子句(后面的when语句都不再考虑满足第一个When子句的记录，即使该记录满足when语句中的条件)。
+INSERT FIRST  
+   WHEN ottl < 100000 THEN  
+      INTO small_orders  
+         VALUES(oid, ottl, sid, cid)  
+   WHEN ottl > 100000 and ottl < 200000 THEN  
+      INTO medium_orders  
+         VALUES(oid, ottl, sid, cid)  
+   WHEN ottl > 290000 THEN  
+      INTO special_orders  
+   WHEN ottl > 200000 THEN  
+      INTO large_orders  
+         VALUES(oid, ottl, sid, cid)  
+   SELECT o.order_id oid, o.customer_id cid, o.order_total ottl,  
+      o.sales_rep_id sid, c.credit_limit cl, c.cust_email cem  
+      FROM orders o, customers c  
+      WHERE o.customer_id = c.customer_id;
