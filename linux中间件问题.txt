@@ -1,0 +1,37 @@
+1.apache2配置
+1.)打开终端
+ 快捷键 Ctrl+Alt+T
+2.)输入下面的命令安装apache2
+     sudo apt-get install apache2
+     当提示“您希望继续执行吗？”时  输入 Y
+     然后等待安装完成
+3. 配置apache2
+1.)进入目录 /etc/apache2   
+输入下面的命令可实现进入目录
+cd /etc/apache2
+2.)编辑apache2.conf配置文件。 输入下面的命令可实现编辑
+sudo vim apache2.conf
+在文件末尾加入下面的命令
+ ServerName localhost:80  
+DirectoryIndex index.html index.htm index.php  
+AddDefaultCharest GB2312 
+3.)更改配置文件  000-default.conf
+3.1进入目录 /etc/apache2/sites-available
+  cd /etc/apache2/sites-available
+3.2编辑 000-default.conf
+ sudo vim 000-default.conf
+3.3把  DocumentRoot /var/www/html 改为 DocumentRoot /var/www 
+后续访问的页面就放在/var/www
+2.apache2安装在ubuntu上
+1.)Start Apache 2 Server /启动apache服务
+# /etc/init.d/apache2 start
+or
+$ sudo /etc/init.d/apache2 start
+2.) Restart Apache 2 Server /重启apache服务
+# /etc/init.d/apache2 restart
+or
+$ sudo /etc/init.d/apache2 restart
+3.)Stop Apache 2 Server /停止apache服务
+# /etc/init.d/apache2 stop
+or
+$ sudo /etc/init.d/apache2 stop

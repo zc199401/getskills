@@ -1,5 +1,6 @@
 windows上的ssh secure shell client连接ubuntu
 
+首先确认网络是否正常，如果是正常的，互ping下
 windows可以ping不通ubuntu，但虚拟机ubuntu能ping通windows
 解决方法：换成bridge模式即可
 
@@ -36,10 +37,8 @@ sudo apt-get install openssh-server
 查看Ubuntu 16.04的IP地址 
 打开”终端窗口”，输入”sudo ifconfig“–>回车–>就可以查看到IP地址。
 但后续使用ssh secure shell client 登录时显示algorithm negotiation failed
-ssh secure shell clinet访问成功
-后续使用ssh secure shell client 登录时显示algorithm negotiation failed
 修改server端ssh的配置文件 /etc/ssh/sshd_config
-
+ssh secure shell clinet访问成功
 在配置文件中添加：
 
 Ciphers aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,3des-cbc,arcfour128,arcfour256,arcfour,blowfish-cbc,cast128-cbc
