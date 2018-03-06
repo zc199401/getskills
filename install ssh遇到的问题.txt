@@ -1,6 +1,6 @@
 windows上的ssh secure shell client连接ubuntu
 
-首先确认网络是否正常，如果是正常的，互ping下
+首先确认网络是否正常(先为NAT，再换为桥接)，如果是正常的，互ping下
 windows可以ping不通ubuntu，但虚拟机ubuntu能ping通windows
 解决方法：换成bridge模式即可
 
