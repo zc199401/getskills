@@ -1,0 +1,122 @@
+1.apache2配置
+1.)打开终端
+ 快捷键 Ctrl+Alt+T
+2.)输入下面的命令安装apache2
+     sudo apt-get install apache2
+     当提示“您希望继续执行吗？”时  输入 Y
+     然后等待安装完成
+3.)查看Apache版本
+apachectl -v
+3. 配置apache2
+1.)进入目录 /etc/apache2   
+输入下面的命令可实现进入目录
+cd /etc/apache2
+2.)编辑apache2.conf配置文件。 输入下面的命令可实现编辑
+sudo vim apache2.conf
+在文件末尾加入下面的命令
+ ServerName localhost:80  
+DirectoryIndex index.html index.htm index.php  
+AddDefaultCharest GB2312 
+3.)更改配置文件  000-default.conf
+3.1进入目录 /etc/apache2/sites-available
+  cd /etc/apache2/sites-available
+3.2编辑 000-default.conf
+ sudo vim 000-default.conf
+3.3把  DocumentRoot /var/www/html 改为 DocumentRoot /var/www 
+后续访问的页面就放在/var/www
+2.apache2安装在ubuntu上
+1.)Start Apache 2 Server /启动apache服务
+# /etc/init.d/apache2 start
+or
+$ sudo /etc/init.d/apache2 start
+2.) Restart Apache 2 Server /重启apache服务
+# /etc/init.d/apache2 restart
+or
+$ sudo /etc/init.d/apache2 restart
+3.)Stop Apache 2 Server /停止apache服务
+# /etc/init.d/apache2 stop
+or
+$ sudo /etc/init.d/apache2 stop
+
+重装Apache2
+ubuntu 重新安装apache2 
+1.)删除apache 
+sudo apt-get --purge remove apache2 
+sudo apt-get --purge remove apache2.2-common 
+sudo apt-get autoremove 
+2.)找到没有删干净的配置文件，删除 
+sudo find /etc -name "*apache*" -exec rm -rf {};
+sudo rm -rf /var/www 
+3.)重装apache2 
+sudo apt-get install apache2 
+sudo /etc/init.d/apache2 restart 
+4.)第三步未安装apxs
+2.tomcat安装
+1.)进tomcat官网下载linux版本(.gz)
+解压到目录下即可 tar -zxvf tomcat.tar.gz
+2.)进入bin目录，执行sh startup.sh
+3.)在浏览器上输入localhost:8080验证是否安装成功
+
+3.mod_jk.so安装
+1.)官网下载地址：http://tomcat.apache.org/download-connectors.cgi
+2.)解压到usr/local
+3.)进入native中
+cd /usr/local/tomcat-connectors-1.2.42-src/native
+# ./configure --with-apxs=/usr/bin/apxs(此处apxs地址可能不一样，可用命令" whereis apxs "来查看)，再make
+完成编译后，在/usr/local/tomcat-connectors-1.2.42-src/native/apache-2.0文件夹下可以找到mod_jk.so文件。将这个文件复制到apache安装路径下的modules文件夹下(whereis modules)
+
+存在问题:
+在编译mod_jk.so文件的时候，我遇到了找不到apxs文件，所以编译不了，apxs是一个为Apache HTTP服务器编译和安装扩展模块的工具，用于编译一个或多个源程序或目标代码文件为动态共享对象，使之可以用由mod_so提供的LoadModule指令在运行时加载到Apache服务器中。
+
+（1） 检查 apxs 有没有安装。” # whereis apxs ” 
+（2） 如果没有的话，先安装apxs
+sudo apt-get install apache2-dev(安装前apt-get update)
+后续整合:http://blog.csdn.net/kesixin/article/details/77779021(cetos)
+ubuntu整合:
+1.安装AJP13并配置
+AJP13是连接Apache2与Tomcat的连接器. 通过mod_jk来实现,命令如下
+[html] view plain copy
+apt-get install libapache2-mod-jk  
+安装后到/etc/libapache2-mod-jk目录, 查看下有没有workers.properties
+
+使用vi workers.properties命令编辑该文件.
+需要修改以下几个地方
+1). 修改workers.tomcat_home与workers.java_home的值为正确的路径  (这一步是可选,但建议配置上)
+2). 在worker.list后面添加jk-status,jk-manager的值, 配置后如下
+[html] view plain copy
+worker.list=ajp13_worker,jk-status,jk-manager  
+(若不加上这两个值为在apache2启动后看到一些警告信息)
+jk-status与jk-manager用于监控mod_jk的运行与管理(默认只能在本机才能访问)
+其他的使用默认值, 在这儿可以看到默认已经创建了一个名叫ajp13_worker 的worker. 记住这名字, 以后为用到.
+
+修改后记得保存.
+
+
+2.配置拦截规则
+
+此处最重要,用于指定哪些URL由Apache处理, 哪些URL需要转给Tomcat处理.(建议规则为: 所有静态的资源由Apache处理,如图片,JS,CSS, 动态的转给Tomcat处理,如加载数据,业务处理部分)
+进入/etc/apache2/sites-available目录.编辑default文件(命令vi default)
+在</VirtualHost>标签之前与最后一个</Directory>之后添加,示例如下
+
+JkUnMount /*.js ajp13_worker  
+JkUnMount /*.css ajp13_worker  
+JkUnMount /*.htm ajp13_worker  
+JkUnMount /*.png ajp13_worker  
+JkUnMount /*.gif ajp13_worker  
+JkUnMount /*.jpg ajp13_worker  
+JkUnMount /*.jpeg ajp13_worker  
+
+JkMount /*.jsp ajp13_worker  
+JkMount /*.zsfz ajp13_worker
+应该一看就明白了吧, JkUnMount 指定哪些匹配的URL由Apache处理, JkMount指定哪些匹配的URL转给Tomcat处理,如此处配置所有以zsfz,jsp结束的URL转给Tomcat处理. 记得之前叫记得的ajp13_worker有吧 , 在这儿用上了.
+除了使用JkUnMount与JkMount方式以外, 还有其他的方式. 这儿由读者去扩展学习下吧.
+最后，进入tomcat的位置，打开/conf文件夹，对server.xml进行配置在<Host></Host>标签之间加入 
+<Context path="" docBase="/var/www" debug="0" reloadable="true" crossContext="true"/>   
+最后修改好, 别忘了保存.
+
+至此 , 整合配置完成, 下来是测试了. 
+1.在Tomcat的Webapps目录里,在ROOT目录里创建一个test.jsp文件, 里面随便加点内容.
+启动Tomcat 通过http://ip_address:8080/test.jsp访问test.jsp,保证测试通过(注意这儿是直接访问Tomcat)
+2.重启Apache2, 命令 /etc/init.d/apache2 restart
+通过http://ip_address/test.jsp访问,若能访问成功并且内容与之前直接访问Tomcat的一致,则说明配置成功(注意: 此处不加端口)
+同理, 你可以放一张图片到apache2的根目录/var/www里, 并直接访问看能成功否. 
