@@ -1,0 +1,551 @@
+最近学了些liunx命令行，但对于脚本认识不深，所以看了些网上的基本脚本，然后整理了下
+
+1.login.sh(注意问题:判断时变量和值在=左右要有空格，有[]，if后要加;，else后不加then)
+#!/bin/bash
+#提示用户输入用户名
+echo 'please input username:'
+#读取屏幕输入
+read name
+#提示输入密码
+echo "passwd"
+#读取屏幕输入密码
+read passwd
+#判断用户和密码是否匹配
+if [ $name = 'zc' -a $passwd = 'zc1' ]; then
+#匹配，输出right 
+ echo 'right'
+#不匹配输出error
+else
+ echo 'error'
+#结束if判断
+fi
+
+
+2.eq.sh(比较2个数字大小,注意问题test测试表达式的工具)
+#!/bin/bash
+#提示用户输入a,b
+echo 'please input a,b:'
+#读取屏幕输入的a,b
+read a
+read b
+#判断a,b是不是相等
+if test $a -eq $b;
+#如果相等，输出等于
+then echo 'one = two'
+#如果大于，输出大于
+elif test $a -gt $b;
+then echo 'one > two'
+else
+#其他情况，小于
+echo 'one < two'
+#结束if判断
+fi
+
+
+3.file.sh(判断目录是否存在，test -e <filename>)
+#!/bin/bash
+#提示输入目录
+echo "please input dir:"
+#读取屏幕输入
+read dir
+#判断目录是否存在
+if test -e $dir;
+#如果存在，输出exists
+then echo 'exists'
+#如果不存在，输出not exists
+else
+echo 'not exists'
+#结束if判断
+fi
+
+
+4.for.sh(注意问题，变量使用双引号"$i")
+#!/bin/bash
+#清屏
+clear
+#for循环,i在1-10
+for i in `seq 10`
+#do,done
+do
+#输出i
+    echo "$i"
+#结算do	
+done
+
+
+5.user.sh(判断当前用户,注意问题:赋值时=两边无空格)
+#!/bin/bash
+#提示用户输入
+echo "please input your username"
+#读取屏幕输入
+read username
+#将whoami赋值给yourusername变量
+yourusername=$(whoami)
+#判断2值是否相等
+if test $username = $yourusername
+then
+#如果相等，输出正在运行
+echo "you are running"
+else
+#否则为不在运行
+echo "not running"
+#结束if判断
+fi
+
+
+6.rm.sh(删除当前目录下大小为0的文件)
+#!/bin/bash
+#for循环,filename为当前目录下的所有文件(常规)
+for filename in `ls`
+#循环
+do
+#判断文件是否为目录
+    if test -d $filename
+#如果是，则文件大小为0
+    then b=0
+#如果不是目录
+    else
+#取出当前非目录文件的大小	
+      a=$(ls -l $filename |awk '{print $5}')
+#如果大小为0，则是空文件          
+		  if test $a -eq 0
+#删除空文件          
+		  then rm $filename
+#结束if判断		  
+          fi
+#结束do		  
+done
+
+
+7.exists.sh(如果/expory/um下有文件，将其扩容为3G)
+#!/bin/bash
+#列出/export/um下的文件
+while lines=`ls /expory/um`
+do
+#如果为空
+  if test lines=""
+  then 
+#输出空  
+  echo "NULL"
+#睡眠1秒
+  sleep 1
+  else
+#输出文件
+  echo $lines
+#将空间扩充为3G
+  chfs -a size =3G /export/um
+#退出
+  exit 0
+#结束if判断
+  fi
+#结束do
+done
+
+
+8.ip.sh(ping 地址)
+#!/bin/bash
+#i赋值为1-10
+for i in `seq 10`
+do
+  echo "the number of $i computer is "
+#ping地址
+  ping -c 1 192.168.0.$i
+done
+
+
+9.cp.sh(如果文件小于某值，将某目录下的文件复制到当前目录下)
+#!/bin/bash
+#赋值a=2(注意=无空格)
+a=2
+#如果name为某值
+while name='test.log'
+do
+#sleep1秒
+ sleep 1
+#截取文件的大小 
+ b=$(`ls -l $name|awk '{print $5}'`)
+#如果文件大于某值 
+ if test $b -gt $a
+#将当前目录下的文件复制到某目录下 
+ then `cp /opt/*.tar.gz .`
+#退出 
+ exit 0
+#结束if判断
+ fi
+#结束do
+done
+
+
+10.read.sh(打印屏幕的输入,注意问题，表达式判断记得用test)
+#!/bin/bash
+#提示
+echo 'please input(if 'end' then exit):'
+#读取屏幕输入
+while read name
+do
+#如果输入不为end
+if test $name != 'end'
+then
+#输出屏幕输入的内容
+echo $name
+#如果是end,退出
+else
+exit 0
+#结束if判断
+fi
+#结束do
+done
+
+
+11.add.sh(将a.c中的值加1,注意点:if后一定要有fi,运算要加两个括号，让系统知道了里面的值要进行运算，
+否则系统以为是字符串的形式，结果为字符串)
+-------------------------
+cat a.c
+1
+2
+3
+--------------
+#!/bin/bash
+#判断文件是否存在
+if test -e a.c
+then
+#读取文件的内容
+while read line
+do
+#读取的内容行往下移动
+ a=$(($line+1))
+#输出内容 
+ echo $a
+done < a.c
+#其他情况，退出
+else
+exit 0
+#结束if判断
+fi
+
+
+-------------------函数----------------------------
+先解释一些变量，后续函数中会用到:
+$$ 
+Shell本身的PID（ProcessID） 
+$! 
+Shell最后运行的后台Process的PID 
+$? 
+最后运行的命令的结束代码（返回值） 
+$- 
+使用Set命令设定的Flag一览 
+$* 
+所有参数列表。如"$*"用「"」括起来的情况、以"$1 $2 … $n"的形式输出所有参数。 
+$@ 
+所有参数列表。如"$@"用「"」括起来的情况、以"$1" "$2" … "$n" 的形式输出所有参数。 
+$# 
+添加到Shell的参数个数 
+$0 
+Shell本身的文件名 
+$1～$n 
+添加到Shell的各参数值。$1是第1参数、$2是第2参数…
+------------------额外补充-------------------------
+Linux脚本中的break continue exit return
+break
+结束并退出整个循环
+
+
+continue
+在循环中不执行continue下面的代码，转而进入下一轮循环
+
+
+exit
+退出脚本，
+常带一个整数给系统，如 exit 0
+
+
+return
+在函数中将数据返回
+或返回一个结果给调用函数的脚本
+----------------------------------------------------
+12.noargv.sh(无参函数,注意问题:调用函数时不加(小括号))
+#!/bin/bash
+#声明函数
+p ()
+{
+ echo "hello"
+}
+#调用函数(不加小括号)
+p
+
+
+13.argv.sh(有参数函数,注意问题:变量范围)
+#!/bin/bash
+#声明函数
+p_num ()
+{
+#将参数赋值给num 
+ num=$1
+#输出num 
+ echo $num
+}
+#for循环,num为所有参数
+for n in $@
+do
+#调用函数
+ p_num $n
+#结束do 
+done
+---------执行./argv.sh 1 2 3(./argv.sh `seq 3`)
+
+
+14.mkdir.sh(创建文件夹,注意问题: while 旁边的:左右要有空格,break退出整个循环)
+#!/bin/bash
+#while循环(注意:2边有空格)
+while : 
+do
+#提示用户输入
+  echo "please input filename:"
+#读取屏幕输入
+  read a
+#如果存在目录  
+  if test -e /root/$a
+     then echo "file exists"
+  else
+#如果不存在目录，创建目录  
+     mkdir $a 
+#跳出整个循环	 
+     break
+  fi
+#输出exit  
+  echo "exit"
+done  
+
+
+15.getip.sh(获取IP地址)
+#!/bin/bash
+#获取IP地址
+ifconfig |grep "inet addr"|awk '{print $2}'|awk -F ':' '{print $2}'
+#同上一样的命令
+(ifconfig | grep "inet addr:" | awk '{ print $2 }'| sed 's/addr://g')
+
+
+16.maxfile.sh(最大文件)
+#!/bin/bash
+a=0
+#当前目录下的所有文件
+for n in *.*
+do
+#取得文件的大小
+  b=$(ls -l $n | awk '{print $5}')
+#判断文件大小
+  if test $b -gt $a
+#将较大保留  
+  then a=$b
+#取出较大文件名  
+  namemax=$n 
+#结束if判断  
+  fi  
+done
+#输出最大文件的名称
+echo "the max file is $namemax"
+
+
+
+
+17.userip.sh(用户ip重定义到ip.txt，因环境问题未验证)
+#!/bin/bash
+a=1
+while :
+do
+#相加
+  a=$(($a+1))
+#因ip最大的数为255，如果大于此值就退出  
+  if test $a -gt 255
+  then break
+  else
+#取出ip重定义到文件ip.txt中 
+     echo $(ping -c 1 192.168.9.$a |grep 'tt1' |awk '{print $4}')
+     ip=$(ping -c 1 192.168.0.$a |grep 'tt1' | awk '{print $4}' | sed 's/://g')
+     echo $ip >> ip.txt
+  fi
+done
+
+
+18.currentuser.sh(打印当前用户,注意问题:$$当前进程ID)
+#!/bin/bash
+echo "user:"
+#打印当前用户
+echo $(ps |grep "$$" | awk '{print $2}')
+
+
+19.case.sh(case控制语句，注意问题:case in ;; esac)
+#!/bin/bash
+#提示用户输入
+read -p "press some :" key
+#判断输入的值
+case $key in
+#如果是字母
+[a-z]|[A-Z])
+echo "it is letter"
+;;
+#如果是数字
+[0-9])
+echo "it is digit"
+;;
+#其他情况
+*)
+echo "other key"
+;;
+#结束case
+esac
+
+
+20.yesorno.sh
+#!/bin/bash
+#清屏
+clear
+#读取屏幕输入，并赋值给a
+read -p "enter [y/n]:" a
+#判断
+case $a in
+#第一种情况
+y|Y|yes|YES)
+echo "you enter $a"
+;;
+#第二种情况
+n|N|no|NO)
+echo "you enter $a"
+;;
+#其他情况
+*)
+echo "error"
+;;
+esac
+
+
+21.date.sh(系统内置命令，注意问题:who要换行)
+#!/bin/bash
+clear
+echo "Hello $USER"
+echo "today is $(date +%Y-%m-%d )"
+echo "this user is :" 
+who
+echo "this is `uname -s`"
+
+
+22.df.sh(监测磁盘空间，如果大于某值就报警)
+#!/bin/bash
+#取出当前用户IP地址
+IP=`ifconfig eth0|grep 'inet addr'|awk -F ':' '{print $2}'|awk '{print $1}'`
+#获取磁盘空间
+SPACE=`df -hP |awk '{print $5}'|tr '%' ' '|grep '[0-9]'`
+#循环各个磁盘空间
+for spa in $SPACE
+do
+#如果磁盘使用率大于某值 
+    if [ $spa -ge 59 ]
+#输出相应IP
+    then 
+    echo $IP
+#结束if判断    
+	fi
+#结束do
+done
+
+
+23.useradd.sh(批量创建用户)
+#!/bin/bash
+i=1
+#创建用户组
+groupadd class1
+#循环30
+while [ $i -le 30]
+do
+#如果前10，前面加个0
+  if [ $i -le 9]
+  then
+  USERNAME=stu0${i}
+#10及之后  
+  else
+  USERNAME=stu${i}
+#结束if判断 
+  fi
+#添加用户  
+useradd $USERNAME
+#创建用户目录
+mkdir /home/$USERNAME
+#改变目录的用户
+chown -R $USERNAME /home/$USERNAME
+#改变目录的组
+chgrp -R class1 /home/$USERNAME
+#加1
+i=$(($i+1))
+#结束do
+done
+
+
+24.usrdel.sh(批量删除用户)
+#!/bin/bash
+i=1
+USERNAME=stu
+#用户30个
+while [ $i -le 30]
+do
+#如果在10内
+  if [ $i -le 9]
+  then
+#删除用户(注意这个地方的0加上引号)  
+  userdel -r $USERNAME'0'${i}
+  else
+#直接删除  
+  userdel -r $USERNAME${i}
+  fi
+#继续下一个  
+i=$(($i+1))
+#结束do
+done
+
+
+25.mkdir.sh(在/userdata目录下建立50个目录，即user1～user50，并设置每个目录的权限，
+其中其他用户的权限为：读；文件所有者的权限为：读、写、执行；文件所有者所在组的权限为：读、执行)
+#!/bin/bash 
+i=1   
+#50内
+while [ i -le 50 ]   
+do   
+#先判断目录是不是存在
+if [ -d /userdata ];then
+#存在，创建目录并赋权   
+mkdir -p -m 754 /userdata/user$i  #加上-m 754 就不用写下面那一句了  -p 是递归建立目录   
+#chmod 754 /userdata/user$i   
+#输出创建的目录
+echo "user$i"   
+#继续下一个
+let "i = i + 1" （或i=$(($i+1)))
+#如果没此目录  
+else
+#创建目录   
+mkdir /userdata   
+#创建目录并赋权
+mkdir -p -m /userdata/user$i   
+#chmod 754 /userdata/user$i   
+echo "user$i" 
+#继续下一个  
+let "i = i + 1" (或i=$(($i＋1)))
+#结束if判断   
+fi   
+#结束do
+done
+
+
+26.grepstr.sh(用户输入一个名字列表，grep在变量中查找，要求其包含人名Peter)
+#!/bin/sh
+# grepstr
+#提示用户输入
+echo -n "Enter a list of names:"
+#读取屏幕输入
+read list
+#如果输入的值包含某值，输入输出输入/dev/null(此目录一直为空)
+if echo $list | grep "Peter" > /dev/null 2>&1
+then
+    echo "Peter is here"
+    # could do some processing here...
+else
+    echo "Peter's not in the list. No comment!"
+fi
